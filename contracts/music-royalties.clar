@@ -105,3 +105,58 @@
 
 (define-public (get-last-registered-right-id)
 (ok (var-get last-right-id)))
+
+(define-public (is-caller-contract-owner)
+(ok (is-eq tx-sender contract-owner)))
+
+(define-public (is-right-registered? (right-id uint))
+(ok (is-some (map-get? right-owners right-id))))
+
+
+;; -------------------- Read-Only Functions -----------------------
+
+;; Retrieves the royalty data for a specific music right
+(define-read-only (get-royalty-data (right-id uint))
+    (ok (map-get? royalty-data-map right-id)))
+
+;; Retrieves the owner of a specific music right
+(define-read-only (get-owner (right-id uint))
+    (ok (map-get? right-owners right-id)))
+
+;; Checks if a music right with the given ID exists
+(define-read-only (right-exists (right-id uint))
+    (ok (map-get? right-owners right-id)))
+
+;; Retrieves the ID of the last registered music right
+(define-read-only (get-last-right-id)
+    (ok (var-get last-right-id)))
+
+(define-read-only (is-right-registered (right-id uint))
+(ok (is-some (map-get? right-owners right-id))))
+
+(define-read-only (get-total-rights)
+(ok (var-get last-right-id)))
+
+(define-read-only (get-total-registered-rights)
+(ok (var-get last-right-id)))
+
+(define-read-only (is-right-owned (right-id uint))
+  (ok (is-some (map-get? right-owners right-id))))
+
+(define-read-only (get-owner-of-right (right-id uint))
+(ok (map-get? right-owners right-id)))
+
+(define-read-only (right-does-exist (right-id uint))
+(ok (is-some (map-get? right-owners right-id))))
+
+(define-read-only (get-all-registered-rights)
+(ok (var-get last-right-id)))
+
+(define-read-only (count-registered-rights)
+(ok (var-get last-right-id)))
+
+;; ------------------ Contract Initialization ---------------------
+
+;; Initialize the contract by setting the last-right-id variable
+(begin
+    (var-set last-right-id u0))
