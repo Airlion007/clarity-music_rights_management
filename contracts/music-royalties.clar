@@ -112,6 +112,59 @@
 (define-public (is-right-registered? (right-id uint))
 (ok (is-some (map-get? right-owners right-id))))
 
+(define-public (update-right-owner (right-id uint) (new-owner principal))
+(begin
+    (asserts! (is-right-owner right-id tx-sender) err-unauthorized)  ;; Only owner can update
+    (asserts! (is-valid-principal new-owner) err-invalid-new-owner)
+    (map-set right-owners right-id new-owner)  ;; Update the ownership map
+    (ok true)))
+
+
+(define-public (terminate-right (right-id uint))
+(begin
+    (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+    (map-delete right-owners right-id)  ;; Remove right from ownership map
+    (ok true)))
+
+(define-public (claim-royalties (right-id uint) (amount uint))
+(begin
+  (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+  ;; Logic for claiming royalties (e.g., transferring a certain amount)
+  (ok true)))
+
+(define-public (set-royalty-distribution-method (right-id uint) (method (string-ascii 256)))
+(begin
+  (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+  ;; Logic for setting distribution method (e.g., "fixed", "variable")
+  (ok true)))
+
+(define-public (withdraw-royalties (amount uint))
+(begin
+  (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+  ;; Logic for withdrawing royalties to a specific address
+  (ok true)))
+
+(define-public (set-default-royalty-distribution (percentage uint))
+(begin
+  (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+  ;; Logic to set the default distribution for new rights
+  (ok true)))
+
+(define-public (revoke-ownership (right-id uint))
+(begin
+  (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+  (map-set right-owners right-id contract-owner)  ;; Transfers ownership to contract owner
+  (ok true)))
+
+(define-public (get-right-royalty-data (right-id uint))
+(ok (map-get? royalty-data-map right-id)))
+
+(define-public (register-right-with-metadata (royalty-data (string-ascii 256)) (metadata (string-ascii 256)))
+(begin
+  (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+  ;; Logic to store royalty data and metadata
+  (ok true)))
+
 
 ;; -------------------- Read-Only Functions -----------------------
 
@@ -154,6 +207,97 @@
 
 (define-read-only (count-registered-rights)
 (ok (var-get last-right-id)))
+
+(define-read-only (is-right-active (right-id uint))
+  (ok (and 
+    (is-some (map-get? right-owners right-id))
+    (is-right-owner right-id tx-sender))))
+
+(define-read-only (get-multiple-royalty-data 
+  (right-ids (list 10 uint)))
+  (ok (map get-royalty-data right-ids)))
+
+(define-read-only (get-contract-owner)
+  (ok contract-owner))
+
+(define-read-only (get-current-sender)
+  (ok tx-sender))
+
+(define-read-only (verify-right-data (right-id uint))
+  (ok (is-some (map-get? royalty-data-map right-id))))
+
+(define-read-only (get-rights-count)
+  (ok (var-get last-right-id)))
+
+(define-read-only (preview-right-ownership (right-id uint))
+  (ok (map-get? right-owners right-id)))
+
+(define-read-only (count-total-rights)
+  (ok (var-get last-right-id)))
+
+(define-read-only (basic-right-exists (right-id uint))
+  (ok (is-some (map-get? right-owners right-id))))
+
+(define-read-only (verify-ownership (right-id uint))
+  (ok (map-get? right-owners right-id)))
+
+(define-read-only (retrieve-last-right-id)
+  (ok (var-get last-right-id)))
+
+(define-read-only (check-right-ownership (right-id uint))
+  (ok (is-right-owner right-id tx-sender)))
+
+(define-read-only (validate-royalty-length (data (string-ascii 256)))
+  (ok (and 
+    (>= (len data) u1) 
+    (<= (len data) max-royalty-data-length))))
+
+(define-read-only (validate-principal (p principal))
+  (ok (is-valid-principal p)))
+
+(define-read-only (simple-rights-status (right-id uint))
+  (ok (is-some (map-get? royalty-data-map right-id))))
+
+;; Checks if the current sender is the contract owner
+(define-public (is-owner)
+  (ok (is-eq tx-sender contract-owner)))
+
+;; Returns the total number of registered rights
+(define-read-only (total-rights-count)
+  (ok (var-get last-right-id)))
+
+;; Returns the current transaction sender
+(define-read-only (current-sender)
+  (ok tx-sender))
+
+;; Verifies ownership of a specific right
+(define-read-only (verify-right-ownership (right-id uint))
+  (ok (map-get? right-owners right-id)))
+
+;; Checks status of royalty data for a right
+(define-read-only (check-royalty-status (right-id uint))
+  (ok (is-some (map-get? royalty-data-map right-id))))
+
+;; Returns the current transaction principal
+(define-read-only (get-tx-principal)
+  (ok tx-sender))
+
+(define-read-only (get-royalty-by-id (right-id uint))
+  (ok (map-get? royalty-data-map right-id)))
+
+(define-read-only (check-right-existence (right-id uint))
+  (ok (is-some (map-get? right-owners right-id))))
+
+(define-read-only (is-valid-royalty-length (data (string-ascii 256)))
+  (ok (and 
+    (>= (len data) u1) 
+    (<= (len data) max-royalty-data-length))))
+
+(define-read-only (get-total-rights-count)
+  (ok (var-get last-right-id)))
+
+(define-read-only (does-right-exist (right-id uint))
+  (ok (is-some (map-get? right-owners right-id))))
 
 ;; ------------------ Contract Initialization ---------------------
 
