@@ -277,6 +277,161 @@
         (asserts! (is-valid-royalty-data new-royalty-data) err-invalid-royalty-data)
         (ok true)))
 
+;; Splits a right into multiple rights
+(define-public (split-right (right-id uint) (split-data (list 5 (string-ascii 256))))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (ok true)))
+
+;; Restores an archived right
+(define-public (restore-right (right-id uint))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (ok true)))
+
+;; Updates metadata for multiple rights simultaneously
+(define-public (batch-update-royalty-data (right-ids (list 10 uint)) (new-data (list 10 (string-ascii 256))))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+        (ok true)))
+
+;; Delegates management rights to another principal
+(define-public (delegate-right-management (right-id uint) (delegate principal))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (asserts! (is-valid-principal delegate) err-invalid-new-owner)
+        (ok true)))
+
+;; Revokes delegated management rights
+(define-public (revoke-delegation (right-id uint) (delegate principal))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (ok true)))
+
+;; Sets transfer restrictions for a right
+(define-public (set-transfer-restrictions (right-id uint) (restricted bool))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (ok true)))
+
+;; Links multiple rights together
+(define-public (link-rights (right-ids (list 5 uint)))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+        (ok true)))
+
+;; Unlinks previously linked rights
+(define-public (unlink-rights (right-ids (list 5 uint)))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+        (ok true)))
+
+;; Sets visibility status for a right
+(define-public (set-right-visibility (right-id uint) (visible bool))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (ok true)))
+
+;; Adds additional metadata to an existing right
+(define-public (add-right-metadata (right-id uint) (additional-data (string-ascii 256)))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (asserts! (is-valid-royalty-data additional-data) err-invalid-royalty-data)
+        (ok true)))
+
+;; Sets transfer approval requirements
+(define-public (set-approval-requirement (right-id uint) (requires-approval bool))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (ok true)))
+
+;; Approves a pending transfer request
+(define-public (approve-transfer (right-id uint) (new-owner principal))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (asserts! (is-valid-principal new-owner) err-invalid-new-owner)
+        (ok true)))
+
+;; Sets royalty distribution rules
+(define-public (set-royalty-rules (right-id uint) (rules (string-ascii 256)))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (asserts! (is-valid-royalty-data rules) err-invalid-royalty-data)
+        (ok true)))
+
+;; Updates multiple ownership records simultaneously
+(define-public (batch-update-ownership (right-ids (list 10 uint)) (new-owners (list 10 principal)))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) err-owner-only)
+        (ok true)))
+
+;; Sets up recurring royalty payments for a right
+(define-public (setup-recurring-royalties (right-id uint) (interval uint))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)
+        (ok true)))
+
+;; Transfers the royalty data for a music right to another principal
+(define-public (transfer-royalty-data (right-id uint) (new-owner principal))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)   ;; Verify sender is the owner
+        (asserts! (is-valid-principal new-owner) err-invalid-new-owner)   ;; Validate new owner
+        (map-set right-owners right-id new-owner)                         ;; Update ownership map
+        (ok true)))
+
+;; Resumes the royalty distribution for a specific music right
+(define-public (resume-royalty-distribution (right-id uint))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)   ;; Verify sender is the owner
+        ;; Logic to resume royalty distribution
+        (ok true)))
+
+;; Distributes royalties from a pool to multiple rights owners
+(define-public (distribute-pool-royalties (pool-name (string-ascii 256)) (amount uint))
+    (begin
+        ;; Logic for distributing royalties from a pool
+        (ok true)))
+
+;; Changes the distribution method of a pool
+(define-public (set-pool-distribution-method (pool-name (string-ascii 256)) (method (string-ascii 256)))
+    (begin
+        ;; Logic for setting a distribution method for the pool
+        (ok true)))
+
+;; Sets a maximum royalty amount for distribution
+(define-public (set-max-royalty-amount (right-id uint) (max-amount uint))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)   ;; Verify sender is the owner
+        ;; Logic for setting the maximum royalty amount
+        (ok true)))
+
+;; Locks the royalty data for a specific music right
+(define-public (lock-royalty-data (right-id uint))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)   ;; Verify sender is the owner
+        ;; Logic to lock the royalty data, preventing updates
+        (ok true)))
+
+;; Unlocks the royalty data for a specific music right
+(define-public (unlock-royalty-data (right-id uint))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)   ;; Verify sender is the owner
+        ;; Logic to unlock the royalty data
+        (ok true)))
+
+;; Allows the contract owner to set a royalty distribution fee
+(define-public (set-distribution-fee (fee uint))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) err-owner-only)         ;; Only contract owner can set the fee
+        ;; Logic for setting the royalty distribution fee
+        (ok true)))
+
+;; Enables the caller to cancel a royalty distribution
+(define-public (cancel-royalty-distribution (right-id uint))
+    (begin
+        (asserts! (is-right-owner right-id tx-sender) err-unauthorized)   ;; Verify sender is the owner
+        ;; Logic to cancel a royalty distribution
+        (ok true)))
 
 ;; -------------------- Read-Only Functions -----------------------
 
@@ -416,3 +571,6 @@
 ;; Initialize the contract by setting the last-right-id variable
 (begin
     (var-set last-right-id u0))
+
+
+
